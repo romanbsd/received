@@ -22,10 +22,12 @@ Installation
 Modify your [Postfix][4] configuration to deliver mail via LMTP to TCP or UNIX socket.
 
 Example main.cf:
+
     virtual_transport = lmtp:192.168.2.106:1111
     virtual_mailbox_domains = example.com
 
 Create a YAML configuration file which has the following parameters:
+
     {'production'=>{'host'=>hostname, 'database'=>db, 'collection'=>col}}
 
 The mongoid.yml will do, just add the name of collection, i.e.
