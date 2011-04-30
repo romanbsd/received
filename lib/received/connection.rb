@@ -6,7 +6,6 @@ module Received
 
     def initialize(server, backend)
       @server, @backend = server, backend
-#      @buffer = []
       @proto = LMTP.new(self)
     end
 
@@ -17,21 +16,11 @@ module Received
     def receive_data(data)
       logger.debug {"receiving data: #{data.size}"}
       @proto.on_data(data)
-      #@buffer << data
     end
 
     # Client disconnected
     def unbind
       logger.debug "connection closed"
-      # begin
-      #   unless @server.stopping?
-      #     @backend.store(@buffer.join)
-      #     logger.info "saved"
-      #   end
-      # rescue Exception => e
-      #   logger.error "saving failed with: #{e.message}"
-      # end
-      # @buffer = []
       @server.remove_connection(self)
     end
 
@@ -44,6 +33,7 @@ module Received
     def mail_received(mail)
       begin
         @backend.store(mail)
+        logger.info "stored mail from: #{mail[:from]}"
       rescue Exception => e
         logger.error "saving failed with: #{e.message}"
       end

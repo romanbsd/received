@@ -1,4 +1,4 @@
-require 'active_support/core_ext/string/inflections'
+#require 'active_support/core_ext/string/inflections'
 require 'eventmachine'
 require 'received/connection'
 
@@ -92,7 +92,8 @@ module Received
     def create_backend
       backend = options[:backend].to_s
       require 'received/backend/' + backend
-      klass = ('Received::Backend::' + backend.camelize).constantize
+      #klass = ('Received::Backend::' + backend.camelize).constantize
+      klass = eval('Received::Backend::' + backend.capitalize)
       env = ENV['RAILS_ENV'] || 'production'
       config = YAML.load(File.read(options[:config]))[env]
       @backend = klass.new(config)
