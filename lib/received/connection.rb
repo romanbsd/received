@@ -11,11 +11,17 @@ module Received
 
     def post_init
       logger.debug "new connection"
+      @proto.start!
     end
 
     def receive_data(data)
-      logger.debug {"receiving data: #{data.size}"}
+      logger.debug {"receiving data: #{data.inspect}"}
       @proto.on_data(data)
+    end
+
+    def send_data(data)
+      logger.debug {"sending data: #{data.inspect}"}
+      super
     end
 
     # Client disconnected

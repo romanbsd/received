@@ -6,7 +6,6 @@ module Received
     def initialize(conn)
       @conn = conn
       @line = ''
-      reset!
     end
 
     def on_data(data)
@@ -17,7 +16,7 @@ module Received
       end
     end
 
-    def reset!
+    def start!
       @state = :start
       @buf = ''
       @from = nil
@@ -99,18 +98,18 @@ module Received
     end
 
     def start_mail_input
-      emit "354 Start mail input; end with <CRLF>.<CRLF>"
+      emit "354 End data with <CR><LF>.<CR><LF>"
     end
 
     def closing_connection
-      emit "452 localhost closing connection"
-      @conn.close_connection(true)
+      emit "221 Bye"
+      @conn.close_connection_after_writing
     end
 
     # FIXME: RFC2033 requires ENHANCEDSTATUSCODES,
     # but it's not used in Postfix
     def extensions
-       emit "250 8BITMIME\r\n250 PIPELINING"
+       emit "250-8BITMIME\r\n250 PIPELINING"
     end
 
     def ok
