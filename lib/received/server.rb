@@ -79,7 +79,7 @@ module Received
         EventMachine.stop
         true
       else
-        puts "Waiting for #{@connections.size} connection(s) to finish ..."
+        logger.info "Waiting for #{@connections.size} connection(s) to finish..."
         false
       end
     end
