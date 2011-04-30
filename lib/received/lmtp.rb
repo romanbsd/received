@@ -36,6 +36,7 @@ module Received
       when :banner_sent
         if ev.start_with?('LHLO')
           lhlo_response
+          extensions
           :lhlo_received
         else
           error
@@ -104,6 +105,12 @@ module Received
     def closing_connection
       emit "452 localhost closing connection"
       @conn.close_connection(true)
+    end
+
+    # FIXME: RFC2033 requires ENHANCEDSTATUSCODES,
+    # but it's not used in Postfix
+    def extensions
+       emit "250 8BITMIME\r\n250 PIPELINING"
     end
 
     def ok

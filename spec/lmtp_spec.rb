@@ -12,6 +12,7 @@ describe Received::LMTP do
 
   it "does full receive flow" do
     @mock.should_receive(:send_data).with("250-localhost\r\n")
+    @mock.should_receive(:send_data).with("250 8BITMIME\r\n250 PIPELINING\r\n")
     @mock.should_receive(:send_data).with("250 OK\r\n").exactly(3).times
     @mock.should_receive(:send_data).with("354 Start mail input; end with <CRLF>.<CRLF>\r\n")
     @mock.should_receive(:send_data).with("250 OK\r\n").exactly(2).times
@@ -34,12 +35,14 @@ describe Received::LMTP do
 
   it "parses multiline" do
     @mock.should_receive(:send_data).with("250-localhost\r\n")
+    @mock.should_receive(:send_data).with("250 8BITMIME\r\n250 PIPELINING\r\n")
     @mock.should_receive(:send_data).with("250 OK\r\n")
     @proto.on_data("LHLO\r\nMAIL FROM:<spec@example.com>\r\n")
   end
 
   it "buffers commands up to CR/LF" do
     @mock.should_receive(:send_data).with("250-localhost\r\n")
+    @mock.should_receive(:send_data).with("250 8BITMIME\r\n250 PIPELINING\r\n")
     @mock.should_receive(:send_data).with("250 OK\r\n")
     @proto.on_data("LHLO\r\nMAIL FROM")
     @proto.on_data(":<spec@example.com>\r\n")
