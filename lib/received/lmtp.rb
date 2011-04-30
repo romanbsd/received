@@ -2,10 +2,8 @@ module Received
   # RFC2033
   class LMTP
 
-    # conn should respond_to send_data and body_received
     def initialize(conn)
       @conn = conn
-      @line = ''
     end
 
     def on_data(data)
