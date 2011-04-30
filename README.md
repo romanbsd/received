@@ -48,6 +48,8 @@ Check -h for help, port/unix socket path and config file are required.
 Bugs and missing features
 -------------------------
 
+* When using UNIX socket the permissions/ownership are not changed. Use -u and -g when running
+  as daemon or change the permissions/ownership manually.
 * ReceiveD wasn't really tested for compliance with RFC2033
 * It doesn't implement [RFC2034][5] (ENHANCEDSTATUSCODES), because Postfix doesn't seem to care
 * It doesn't perform any validation of the provided input, e.g. LHLO, MAIL FROM, RCPT TO

@@ -1,24 +1,28 @@
 #!/usr/bin/env ruby
 require 'rubygems'
-require 'daemons'
 require 'logger'
-require 'etc'
-#require File.dirname(__FILE__) + '/../lib/received'
+require 'optparse'
 $:<< File.expand_path('../../lib', __FILE__)
 require 'received'
 
 options = {}
 OptionParser.new do |opts|
   opts.banner = 'Usage: received [options]'
-  opts.on('-b', '--backend BACKEND', [:mongodb], 'Backend (mongodb)') {|v| options[:backend] = v}
+  opts.on('-c', '--config FILE', 'Config file name (required)') {|v| options[:config] = v}
+  opts.on('-b', '--backend BACKEND', [:mongodb], 'Backend (default: mongodb)') {|v| options[:backend] = v}
   opts.on('-d', '--daemonize', 'Become a daemon') {|v| options[:daemon] = v}
-  opts.on('-s', '--unix-socket /path/to/socket', 'Use UNIX socket') {|v| options[:unix_socket] = v}
+  opts.on('-s', '--unix-socket PATH', 'Use UNIX socket') {|v| options[:unix_socket] = v}
   opts.on('-p', '--port NUM', 'Listen to TCP port') {|v| options[:port] = v.to_i}
-  opts.on('-h', '--host NAME', 'Bind to this IP (default: 127.0.0.1)') {|v| options[:host] = v}
-  opts.on('-l', '--log FILE', 'Log file name') {|v| options[:logfile] = v}
-#  opts.on('-f', '--pidfile FILE', 'PID file name') {|v| options[:pidfile] = v}
-  opts.on('-c', '--config FILE', 'Config file name') {|v| options[:config] = v}
+  opts.on('-i', '--host NAME', 'Bind to this IP (default: 127.0.0.1)') {|v| options[:host] = v}
+  opts.on('-a', '--piddir PATH', 'Directory for pid file (default: /var/tmp)') {|v| options[:dir] = v}
+  opts.on('-l', '--log FILE', 'Log file name (default: piddir/received.log)') {|v| options[:logfile] = v}
+  opts.on('-u', '--user NAME', 'Effective user when daemon (default: nobody)') {|v| options[:user] = v}
+  opts.on('-g', '--group NAME', 'Effective group when daemon (default: nobody)') {|v| options[:group] = v}
   opts.on('-v', '--verbose', 'Verbose logging') {options[:level] = Logger::DEBUG}
+  opts.on_tail('-h', '--help', 'Show this message') do
+    puts opts
+    exit
+  end
 end.parse!
 
 raise "Config file is required, please provide with -c config.yml" unless options[:config]
@@ -31,9 +35,16 @@ options[:logger] = Logger.new(options[:logfile] || $stderr).tap do |logger|
 end
 
 if options.delete(:daemon)
-  params = {:backtrace => true, :dir_mode => :system, }
+  require 'daemons'
+  # Monkey patch to rename log file
+  class Daemons::Application
+    def output_logfile
+      (options[:log_output] && logdir) ? File.join(logdir, @group.app_name + '.log') : nil
+    end
+  end
+  params = {:app_name => 'received', :log_output => true, :dir_mode => :normal, :dir => options[:dir] || '/var/tmp'}
   # Drop privileges if started as superuser
-  params.merge!({:user => 'nobody', :group => 'nobody'}) if Process.uid == 0
+  params.merge!({:user => options[:user] || 'nobody', :group => options[:group] || 'nobody'}) if Process.uid == 0
   Daemons.daemonize(params)
 end
 
