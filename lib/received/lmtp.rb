@@ -68,7 +68,7 @@ module Received
         end
       when :data
         if ev == ".\r\n"
-          ok
+          @rcpt.size.times {ok}
           mail = {:from => @from, :rcpt => @rcpt, :body => @body.join}
           @conn.mail_received(mail)
           :data_received

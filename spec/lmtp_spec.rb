@@ -14,7 +14,7 @@ describe Received::LMTP do
     @mock.should_receive(:send_data).with("250-localhost\r\n")
     @mock.should_receive(:send_data).with("250 OK\r\n").exactly(3).times
     @mock.should_receive(:send_data).with("354 Start mail input; end with <CRLF>.<CRLF>\r\n")
-    @mock.should_receive(:send_data).with("250 OK\r\n")
+    @mock.should_receive(:send_data).with("250 OK\r\n").exactly(2).times
     @mock.should_receive(:send_data).with("452 localhost closing connection\r\n")
     body = "Subject: spec\r\nspec\r\n"
     @mock.should_receive(:mail_received).with({
