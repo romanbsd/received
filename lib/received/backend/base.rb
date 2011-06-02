@@ -4,8 +4,11 @@ module Received
       # Stores the data
       #
       # @abstract
-      # @param [String] data
-      def store(data)
+      # @param [Hash] mail
+      # @option mail [String] :from
+      # @option mail [Array] :rcpt
+      # @option mail [String] :body
+      def store(mail)
         raise NotImplementedError
       end
     end

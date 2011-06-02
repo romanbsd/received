@@ -33,9 +33,7 @@ module Received
     # Callback, called by protocol handler
     #
     # @param [Hash] mail
-    # @option mail [String] :from
-    # @option mail [Array] :rcpt
-    # @option mail [String] :body
+    # @see Received::Backend::Base#store
     def mail_received(mail)
       begin
         @backend.store(mail)
