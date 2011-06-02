@@ -4,6 +4,8 @@ module Received
 
     def initialize(conn)
       @conn = conn
+      @state = :start
+      @buf = ''
     end
 
     def on_data(data)
@@ -15,19 +17,22 @@ module Received
     end
 
     def start!
-      @state = :start
-      @buf = ''
-      @from = nil
-      @rcpt = []
       event(nil)
     end
 
     private
+    def reset!
+      @buf = ''
+      @from = nil
+      @rcpt = []
+      @body = []
+    end
+
     def event(ev)
       @conn.logger.debug {"state was: #{@state.inspect}"}
       @state = case @state
       when :start
-        @body = []
+        reset!
         banner
         :banner_sent
       when :banner_sent
@@ -107,7 +112,7 @@ module Received
     # FIXME: RFC2033 requires ENHANCEDSTATUSCODES,
     # but it's not used in Postfix
     def extensions
-       emit "250-8BITMIME\r\n250 PIPELINING"
+      emit "250-8BITMIME\r\n250 PIPELINING"
     end
 
     def ok
