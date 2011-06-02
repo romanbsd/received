@@ -10,7 +10,7 @@ module Received
 
     def on_data(data)
       @buf += data
-      while line = @buf.slice!(/.+\r\n/)
+      while line = @buf.slice!(/.*\r\n/)
         line.chomp! unless @state == :data
         event(line)
       end

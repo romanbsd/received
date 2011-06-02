@@ -48,4 +48,15 @@ describe Received::LMTP do
     @proto.on_data("LHLO\r\nMAIL FROM")
     @proto.on_data(":<spec@example.com>\r\n")
   end
+
+  it "passes CR/LF through" do
+    body = "Subject: test\r\n\r\nTest\r\n"
+    @mock.stub!(:send_data)
+    @proto.on_data("LHLO\r\nMAIL FROM:<spec1@example.com>\r\nRCPT TO:<spec2@example.com>\r\nDATA\r\n")
+    @proto.on_data(body)
+    @mock.should_receive(:mail_received) do |r|
+      r[:body].should == body
+    end
+    @proto.on_data(".\r\n")
+  end
 end
