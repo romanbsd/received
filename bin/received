@@ -46,6 +46,7 @@ if options.delete(:daemon)
   # Drop privileges if started as superuser
   params.merge!({:user => options[:user] || 'nobody', :group => options[:group] || 'nobody'}) if Process.uid == 0
   Daemons.daemonize(params)
+  File.umask(0007)
 end
 
 server = Received::Server.new(options)
