@@ -71,9 +71,12 @@ module Received
         end
       when :data
         if ev == ".\r\n"
-          @rcpt.size.times {ok}
           mail = {:from => @from, :rcpt => @rcpt, :body => @body.join}
-          @conn.mail_received(mail)
+          if @conn.mail_received(mail)
+            @rcpt.size.times {ok}
+          else
+            @rcpt.size.times {error_in_processing}
+          end
           :data_received
         else
           @body << ev
@@ -121,6 +124,10 @@ module Received
 
     def error
       emit "500 command unrecognized"
+    end
+
+    def error_in_processing
+      emit "451 Requested action aborted: local error in processing"
     end
 
     def emit(str)

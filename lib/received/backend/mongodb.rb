@@ -18,8 +18,9 @@ module Received
       # Store mail in MongoDB
       #
       # @param [Hash] mail
+      # @return [ObjectId] object_id
       def store(mail)
-        @coll.save(mail.merge({:ts => Time.now.to_i}), :safe => true)
+        @coll.insert(mail.merge({:ts => Time.now.to_i}), :safe => {:fsync => true})
       end
     end
   end

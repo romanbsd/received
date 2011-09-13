@@ -34,12 +34,19 @@ module Received
     #
     # @param [Hash] mail
     # @see Received::Backend::Base#store
+    # @return [Boolean] saving succeeded
     def mail_received(mail)
       begin
-        @backend.store(mail)
-        logger.info "stored mail from: #{mail[:from]}"
+        if insert_id = @backend.store(mail)
+          logger.info "stored mail from: #{mail[:from]} (#{insert_id})"
+          return true
+        else
+          logger.error "saving of mail from #{mail[:from]} failed"
+        end
+        false
       rescue Exception => e
-        logger.error "saving failed with: #{e.message}"
+        logger.error "saving of mail from #{mail[:from]} failed with: #{e.message}"
+        false
       end
     end
 
