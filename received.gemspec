@@ -18,6 +18,6 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
   s.add_runtime_dependency 'daemons'
   s.add_runtime_dependency 'eventmachine'
-  s.add_runtime_dependency 'mongo', '~>1.3.0'
-  s.add_runtime_dependency 'bson_ext', '~>1.3.0'
+  s.add_runtime_dependency 'mongo', '>=1.3.0'
+  s.add_runtime_dependency 'bson_ext', '>=1.3.0'
 end
