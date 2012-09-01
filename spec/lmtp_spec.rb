@@ -85,7 +85,6 @@ describe Received::LMTP do
     conn.stub(:send_data)
     conn.stub(:close_connection_after_writing)
     conn.should_receive(:mail_received) do |mail|
-      puts "RECEIVED     '#{mail.inspect}'"
       mail[:from].should be_empty
     end
 
