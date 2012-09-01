@@ -44,7 +44,7 @@ module Received
           error
         end
       when :lhlo_received
-        if ev =~ /^MAIL FROM:<?([^>]+)/
+        if ev =~ /^MAIL FROM:<?([^<>]*)/
           @from = $1
           ok
           :mail_from_received
@@ -52,7 +52,7 @@ module Received
           error
         end
       when :mail_from_received
-        if ev =~ /^RCPT TO:<?([^>]+)/
+        if ev =~ /^RCPT TO:<?([^<>]*)/
           @rcpt << $1
           ok
           :rcpt_to_received
@@ -60,7 +60,7 @@ module Received
           error
         end
       when :rcpt_to_received
-        if ev =~ /^RCPT TO:<?([^>]+)/
+        if ev =~ /^RCPT TO:<?([^<>]*)/
           @rcpt << $1
           ok
         elsif ev == "DATA"
