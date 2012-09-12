@@ -71,7 +71,7 @@ module Received
         end
       when :data
         if ev == ".\r\n"
-          mail = {:from => @from, :rcpt => @rcpt, :body => @body.join}
+          mail = {:from => @from, :rcpt => @rcpt, :body => @body.join.force_encoding('BINARY')}
           if @conn.mail_received(mail)
             @rcpt.size.times {ok}
           else
