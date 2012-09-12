@@ -46,6 +46,7 @@ module Received
         false
       rescue Exception => e
         logger.error "saving of mail from #{mail[:from]} failed with: #{e.message}"
+        logger.error e.backtrace.join("\n")
         false
       end
     end
