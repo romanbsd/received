@@ -18,6 +18,7 @@ OptionParser.new do |opts|
   opts.on('-l', '--log FILE', 'Log file name (default: piddir/received.log)') {|v| options[:logfile] = v}
   opts.on('-u', '--user NAME', 'Effective user when daemon (default: nobody)') {|v| options[:user] = v}
   opts.on('-g', '--group NAME', 'Effective group when daemon (default: nobody)') {|v| options[:group] = v}
+  opts.on('-r', '--require FILE1,FILE2,...', 'Require ruby file(s)') {|v| options[:require] = v}
   opts.on('-v', '--verbose', 'Verbose logging') {options[:level] = Logger::DEBUG}
   opts.on_tail('-h', '--help', 'Show this message') do
     puts opts
@@ -53,4 +54,9 @@ server = Received::Server.new(options)
 %w(TERM INT).each do |sig|
   Signal.trap(sig) {server.stop}
 end
+
+if files = options[:require]
+  files.split(',').each { |file| require file }
+end
+
 server.serve!
