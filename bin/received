@@ -4,6 +4,7 @@ require 'logger'
 require 'optparse'
 $:<< File.expand_path('../../lib', __FILE__)
 require 'received'
+require 'daemons'
 
 options = {}
 OptionParser.new do |opts|
@@ -14,8 +15,8 @@ OptionParser.new do |opts|
   opts.on('-s', '--unix-socket PATH', 'Use UNIX socket') {|v| options[:unix_socket] = v}
   opts.on('-p', '--port NUM', 'Listen to TCP port') {|v| options[:port] = v.to_i}
   opts.on('-i', '--host NAME', 'Bind to this IP (default: 127.0.0.1)') {|v| options[:host] = v}
-  opts.on('-a', '--piddir PATH', 'Directory for pid file (default: /var/tmp)') {|v| options[:dir] = v}
-  opts.on('-l', '--log FILE', 'Log file name (default: piddir/received.log)') {|v| options[:logfile] = v}
+  opts.on('-a', '--piddir PATH', 'Directory for pid file (default: /var/run/received)') {|v| options[:dir] = v}
+  opts.on('-l', '--log FILE', 'Log file name (default: /var/log/received.log)') {|v| options[:logfile] = v}
   opts.on('-u', '--user NAME', 'Effective user when daemon (default: nobody)') {|v| options[:user] = v}
   opts.on('-g', '--group NAME', 'Effective group when daemon (default: nobody)') {|v| options[:group] = v}
   opts.on('-r', '--require FILE1,FILE2,...', 'Require ruby file(s)') {|v| options[:require] = v}
@@ -30,33 +31,33 @@ raise "Config file is required, please provide with -c config.yml" unless option
 
 # Default backend
 options[:backend] ||= 'mongodb'
+options[:dir] ||= '/var/run/received'
 
 options[:logger] = Logger.new(options[:logfile] || $stderr).tap do |logger|
   logger.level = options[:level] || Logger::INFO
 end
 
-if options.delete(:daemon)
-  require 'daemons'
-  # Monkey patch to rename log file
-  class Daemons::Application
-    def output_logfile
-      (options[:log_output] && logdir) ? File.join(logdir, @group.app_name + '.log') : nil
-    end
-  end
-  params = {:app_name => 'received', :log_output => true, :dir_mode => :normal, :dir => options[:dir] || '/var/tmp'}
-  # Drop privileges if started as superuser
-  params.merge!({:user => options[:user] || 'nobody', :group => options[:group] || 'nobody'}) if Process.uid == 0
-  Daemons.daemonize(params)
-  File.umask(0007)
+ontop = !options.delete(:daemon)
+params = {
+  :ontop => ontop,
+  :app_name => 'received',
+  :log_output => true,
+  :dir_mode => :normal,
+  :dir => options[:dir]
+}
+
+# Drop privileges if started as superuser
+params.merge!(:user => options[:user] || 'nobody', :group => options[:group] || 'nobody') if Process.uid == 0
+Daemons.daemonize(params)
+File.umask(0007)
+
+if files = options[:require]
+  files.split(',').each { |file| require file }
 end
 
 server = Received::Server.new(options)
 %w(TERM INT).each do |sig|
   Signal.trap(sig) {server.stop}
-end
-
-if files = options[:require]
-  files.split(',').each { |file| require file }
 end
 
 server.serve!

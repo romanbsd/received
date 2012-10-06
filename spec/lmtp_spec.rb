@@ -2,12 +2,16 @@ require 'spec_helper'
 require 'logger'
 
 describe Received::LMTP do
-  let(:conn) { mock(:conn, :logger => Logger.new(STDERR)) }
+  let(:conn) { mock(:conn) }
   let(:proto) { Received::LMTP.new(conn) }
+
+  before :all do
+    Received.logger = Logger.new(STDERR)
+  end
 
   before do
     conn.should_receive(:send_data).with("220 localhost LMTP server ready\r\n")
-    conn.logger.debug "*** Starting test ***"
+    #conn.logger.debug "*** Starting test ***"
     proto.start!
   end
 
@@ -17,7 +21,7 @@ describe Received::LMTP do
     def begin_flow!
       ["LHLO", "MAIL FROM:<spec1@example.com>", "RCPT TO:<spec2@example.com>",
         "RCPT TO:<spec3@example.com>", "DATA", "#{body}.", "QUIT"].each do |line|
-        conn.logger.debug "client: #{line}"
+        # conn.logger.debug "client: #{line}"
         proto.on_data(line + "\r\n")
       end
     end

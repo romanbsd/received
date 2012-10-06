@@ -29,7 +29,7 @@ module Received
     end
 
     def event(ev)
-      @conn.logger.debug {"state was: #{@state.inspect}"}
+      Received.logger.debug {"state was: #{@state.inspect}"}
       @state = case @state
       when :start
         reset!
@@ -92,7 +92,7 @@ module Received
       else
         raise "Where am I? (#{@state.inspect})"
       end || @state
-      @conn.logger.debug {"state now: #{@state.inspect}"}
+      Received.logger.debug {"state now: #{@state.inspect}"}
     end
 
     def banner

@@ -52,7 +52,7 @@ module Received
     end
 
     def logger
-      @server.logger
+      Received.logger
     end
   end
 end

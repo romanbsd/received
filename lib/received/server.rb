@@ -5,11 +5,11 @@ require 'received/connection'
 
 module Received
   class Server
-    attr_reader :logger, :options
+    attr_reader :options
 
     def initialize(options)
       @options = options
-      @logger = options[:logger] || Logger.new($stderr)
+      Received.logger ||= (options[:logger] || Logger.new(STDERR))
       @connections = []
       # For how long the server will wait for connections to finish
       @grace_period = options[:grace_period] || 10
@@ -61,6 +61,10 @@ module Received
     def remove_connection(conn)
       @connections.delete(conn)
       set_title
+    end
+
+    def logger
+      Received.logger
     end
 
     private
