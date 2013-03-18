@@ -21,7 +21,7 @@ module Received
       # @return [ObjectId] object_id
       def store(mail)
         mail = mail.merge(:ts => Time.now.to_i, :body => BSON::Binary.new(mail[:body]))
-        @coll.insert(mail, :safe => {:fsync => true}).tap do |result|
+        @coll.insert(mail, :w => 1, :fsync => true).tap do |result|
           notify_observers(:after_save, result) if result
         end
       end
