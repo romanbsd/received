@@ -1,6 +1,11 @@
 ReceiveD
 ========
 
+***
+I don't use it anymore, but when it was used, it was used in production.
+I consider it stable, rather than obsolete.
+***
+
 ReceiveD is yet another way for receiving mail with Rails.
 Why have yet another subsystem (like IMAP), when you can deliver the mail
 directly to your data store?
