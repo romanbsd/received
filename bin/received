@@ -10,7 +10,7 @@ options = {}
 OptionParser.new do |opts|
   opts.banner = 'Usage: received [options]'
   opts.on('-c', '--config FILE', 'Config file name (required)') {|v| options[:config] = v}
-  opts.on('-b', '--backend BACKEND', [:mongodb], 'Backend (default: mongodb)') {|v| options[:backend] = v}
+  opts.on('-b', '--backend BACKEND', [:mongodb, :sidekiq], 'Backend (default: mongodb)') {|v| options[:backend] = v}
   opts.on('-d', '--daemonize', 'Become a daemon') {|v| options[:daemon] = v}
   opts.on('-s', '--unix-socket PATH', 'Use UNIX socket') {|v| options[:unix_socket] = v}
   opts.on('-p', '--port NUM', 'Listen to TCP port') {|v| options[:port] = v.to_i}
