@@ -13,10 +13,10 @@ Gem::Specification.new do |s|
   s.summary     = %q{Receive mail from Postfix and store it somewhere}
   s.description = %q{Currently stores received mail in MongoDB}
 
-  s.files         = `git ls-files`.split("\n")
-  s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
-  s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
+  s.files         = Dir["lib/**/*", "*.gemspec", "LICENSE*", "README*"]
+  s.executables   = Dir["bin/*"].map { |f| File.basename(f) }
   s.require_paths = ["lib"]
+
   s.add_runtime_dependency 'daemons', '~> 1.1'
   s.add_runtime_dependency 'eventmachine', '~> 1.0'
   s.add_runtime_dependency 'mongo', '~> 1.3'
