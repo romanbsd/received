@@ -8,7 +8,8 @@ Gem::Specification.new do |s|
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Roman Shterenzon"]
   s.email       = ["romanbsd@yahoo.com"]
-  s.homepage    = ""
+  s.homepage    = "https://github.com/romanbsd/received"
+  s.license     = "MIT"
   s.summary     = %q{Receive mail from Postfix and store it somewhere}
   s.description = %q{Currently stores received mail in MongoDB}
 
