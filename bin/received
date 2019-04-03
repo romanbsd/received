@@ -45,6 +45,7 @@ params = {
   :dir_mode => :normal,
   :dir => options[:dir]
 }
+params[:no_pidfiles] = true if ontop
 
 # Drop privileges if started as superuser
 params.merge!(:user => options[:user] || 'nobody', :group => options[:group] || 'nobody') if Process.uid == 0
