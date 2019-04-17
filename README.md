@@ -16,7 +16,7 @@ ReceiveD is almost [RFC2033][1] compliant LMTP server built around
 The receive daemon will listen on TCP or UNIX socket, and write the mail
 to the backend storage.
 
-Currently only [MongoDB][3] is supported, but writing another backend
+Currently only [MongoDB][3] and [Sidekiq][6]/Redis is supported, but writing another backend
 (MySQL, Redis, etc.) is trivial.
 
 
@@ -31,6 +31,14 @@ Example main.cf:
     virtual_transport = lmtp:192.168.2.106:1111
     virtual_mailbox_domains = example.com
 
+Create a YAML configuration file with parameters for the selected backend.
+
+The default environment is *production*, but you can specify other environment
+using RAILS_ENV environment variable.
+In this case, make sure you have the relevant key in your configuration file.
+
+### MongoDB
+
 Create a YAML configuration file which has the following parameters:
 
     {'production'=>{'host'=>hostname, 'database'=>db, 'collection'=>col}}
@@ -42,9 +50,15 @@ The mongoid.yml will do, just add the name of collection, i.e.
       database: foo_production
       collection: inbox
 
-The default environment is *production*, but you can specify other environment
-using RAILS_ENV environment variable.
-In this case, make sure you have the relevant key in your configuration file.
+### Sidekiq/Redis
+
+Example:
+
+    production:
+      redis_url: redis://localhost:6379
+      namespace: resque:gitlab
+      queue: email_receiver
+      worker: EmailReceiverWorker
 
 
 Running
@@ -66,5 +80,6 @@ Bugs and missing features
 [3]: http://www.mongodb.org/
 [4]: http://www.postfix.org/
 [5]: http://tools.ietf.org/html/rfc2034
+[6]: https://sidekiq.org/
 
 Copyright (c) 2011 Roman Shterenzon, released under the MIT license
